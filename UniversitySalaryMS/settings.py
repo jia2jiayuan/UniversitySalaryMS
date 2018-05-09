@@ -73,10 +73,14 @@ WSGI_APPLICATION = 'UniversitySalaryMS.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
+# MySQL数据库连接配置
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': "UniversitySalaryMS",
+        'USER': "salaryMS",
+        'PASSWORD': "123456",
+        'HOST': '10.0.0.120'
     }
 }
 
@@ -103,15 +107,18 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+# 设置语言为中文
+LANGUAGE_CODE = 'zh-hans'
 
-TIME_ZONE = 'UTC'
+# 设置时区为上海
+TIME_ZONE = 'Asia/Shanghai'
 
+# 国际化标准支持
 USE_I18N = True
-
 USE_L10N = True
 
-USE_TZ = True
+# 禁用UTC时间
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
