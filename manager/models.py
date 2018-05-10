@@ -35,3 +35,27 @@ class Manager(AbstractUser):
     def __str__(self):
         # 创建对象返回的信息提示
         return self.name
+
+
+class Worklog(models.Model):
+    """
+    管理员工作日志记录表
+    """
+    WORK_STATUS = (
+        (0, "未完成"),
+        (1, "完成"),
+    )
+    name = models.CharField(max_length=20, verbose_name="工作名")
+    content = models.TextField(verbose_name="工作内容")
+    start_time = models.DateTimeField(verbose_name="开始时间")
+    end_time = models.DateTimeField(verbose_name="结束时间")
+    has_finished = models.IntegerField(choices=WORK_STATUS, default=0, verbose_name="是否完成工作")
+    manager = models.ForeignKey(Manager, on_delete=models.CASCADE, verbose_name="管理员")
+    add_time = models.DateTimeField(default=datetime.now, verbose_name="添加记录时间")
+
+    class Meta:
+        verbose_name = "工作日志信息"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.name
