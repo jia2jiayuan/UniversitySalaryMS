@@ -1,5 +1,7 @@
 from django.db import models
-from datetime import  datetime
+from datetime import datetime
+
+from manager.models import Manager
 
 
 class Job(models.Model):
@@ -68,7 +70,6 @@ class Worker(models.Model):
     is_core = models.IntegerField(choices=IS_CORE, default=0, verbose_name="是否是核心成员")
     is_charge = models.IntegerField(choices=IS_CHARGE, default=0, verbose_name="是否主负责人")
     job = models.ForeignKey(Job, on_delete=models.CASCADE, verbose_name="职位")
-    comment = models.ForeignKey(verbose_name="员工评价")
     department = models.ForeignKey(verbose_name="所属部门")
 
     add_time = models.DateTimeField(default=datetime.now, verbose_name="添加记录时间")
@@ -79,3 +80,28 @@ class Worker(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Comment(models.Model):
+    """
+    员工评价信息表
+    """
+    IS_MEET = (
+        (0, '未达到'),
+        (1, '达到')
+    )
+    expect_requirements = models.TextField(verbose_name="预期要求")
+    is_meet = models.IntegerField(choices=IS_MEET, default=0, verbose_name="是否达到预期")
+    aspect = models.CharField(max_length=200, verbose_name="针对哪方面")
+    comment = models.TextField(verbose_name="评价内容")
+    comment_user = models.ForeignKey(Manager, on_delete=models.CASCADE, verbose_name="评价人")
+    worker = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name="员工")
+
+    add_time = models.DateTimeField(default=datetime.now, verbose_name="添加记录时间")
+
+    class Meta:
+        verbose_name = "员工评价信息"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.worker.name
