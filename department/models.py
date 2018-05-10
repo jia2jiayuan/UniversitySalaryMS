@@ -12,7 +12,7 @@ class Job(models.Model):
     )
     name = models.CharField(max_length=20, verbose_name="职位名")
     description = models.TextField(verbose_name="工作描叙")
-    expect_salary = models.DecimalField(verbose_name="预估工资")
+    expect_salary = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="预估工资")
     is_core = models.IntegerField(choices=IS_CORE, default=0, verbose_name="是否是核心职位")
 
     add_time = models.DateTimeField(default=datetime.now, verbose_name="添加记录时间")

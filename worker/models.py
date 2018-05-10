@@ -34,6 +34,7 @@ class Worker(models.Model):
         (1, '是')
     )
     name = models.CharField(max_length=20, verbose_name="姓名")
+    image = models.ImageField(max_length=50, verbose_name="相片")
     sex = models.CharField(max_length=6, choices=SEX,default="male", verbose_name="性别")
     birthday = models.DateField(verbose_name="出生日期")
     phone_number = models.CharField(max_length=11, verbose_name='手机号码')
@@ -94,8 +95,8 @@ class Salary(models.Model):
         (1, '发放')
     )
     worker = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name="职工")
-    salary = models.DecimalField(verbose_name="工资")
-    achievements = models.DecimalField(default=0, verbose_name="绩效")
+    salary = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="工资")
+    achievements = models.DecimalField(default=0, max_digits=1, decimal_places=1, verbose_name="绩效")
     has_pay = models.IntegerField(default=0, verbose_name="是否结算工资")
 
     add_time = models.DateTimeField(default=datetime.now, verbose_name="添加记录时间")

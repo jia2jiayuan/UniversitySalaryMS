@@ -9,7 +9,7 @@ from datetime import datetime
 class Manager(AbstractUser):
     """
     管理者信息表，扩展了django默认用户表
-    还需要在setting中配置 AUTH_USER_MODEL = 'users.Manager' 替换掉默认User表
+    还需要在setting中配置 AUTH_USER_MODEL = 'manager.Manager' 替换掉默认User表
     """
     SEX = (
         ('male', '男'),
@@ -21,8 +21,8 @@ class Manager(AbstractUser):
     birthday = models.DateField(verbose_name="出生日期")
     phone_number = models.CharField(max_length=11, verbose_name='手机号码')
     qq_number = models.CharField(max_length=11, verbose_name='QQ账号')
-    work_description = models.TextField(validators="职业描叙")
-    join_time = models.DateTimeField(default=datetime.norw, verbose_name="入职时间")
+    work_description = models.TextField(verbose_name="职业描叙")
+    join_time = models.DateTimeField(default=datetime.now, verbose_name="入职时间")
 
     add_time = models.DateTimeField(default=datetime.now, verbose_name="添加记录时间")
 

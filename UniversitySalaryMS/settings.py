@@ -37,6 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+     # 注册创建的app
+    'manager.apps.ManagerConfig',
+    'worker.apps.WorkerConfig',
+    'department.apps.DepartmentConfig',
 ]
 
 MIDDLEWARE = [
@@ -52,7 +56,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'UniversitySalaryMS.urls'
 
 # 替换掉默认User表
-AUTH_USER_MODEL = 'users.Manager'
+AUTH_USER_MODEL = 'manager.Manager'
 
 TEMPLATES = [
     {
