@@ -23,6 +23,7 @@ class Manager(AbstractUser):
     qq_number = models.CharField(max_length=11, verbose_name='QQ账号')
     work_description = models.TextField(validators="职业描叙")
     join_time = models.DateTimeField(default=datetime.norw, verbose_name="入职时间")
+
     add_time = models.DateTimeField(default=datetime.now, verbose_name="添加记录时间")
 
     class Meta:
