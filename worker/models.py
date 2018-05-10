@@ -105,3 +105,27 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.worker.name
+
+
+class Salary(models.Model):
+    """
+    员工工资表
+    """
+    HAS_PAY = (
+        (0, '未发放'),
+        (1, '发放')
+    )
+    worker = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name="职工")
+    salary = models.DecimalField(verbose_name="工资")
+    achievements = models.DecimalField(default=0, verbose_name="绩效")
+    has_pay = models.IntegerField(default=0, verbose_name="是否结算工资")
+
+    add_time = models.DateTimeField(default=datetime.now, verbose_name="添加记录时间")
+
+    class Meta:
+        verbose_name = "员工工资信息"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.worker.name
+
