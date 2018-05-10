@@ -51,6 +51,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'UniversitySalaryMS.urls'
 
+# 替换掉默认User表
+AUTH_USER_MODEL = 'users.Manager'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
