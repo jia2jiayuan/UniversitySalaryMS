@@ -2,29 +2,7 @@ from django.db import models
 from datetime import datetime
 
 from manager.models import Manager
-
-
-class Job(models.Model):
-    """
-    职位信息表
-    """
-    IS_CORE = (
-        (0, '不是'),
-        (1, '是')
-    )
-    name = models.CharField(max_length=20, verbose_name="职位名")
-    description = models.TextField(verbose_name="工作描叙")
-    expect_salary = models.DecimalField(verbose_name="预估工资")
-    is_core = models.IntegerField(choices=IS_CORE, default=0, verbose_name="是否是核心职位")
-
-    add_time = models.DateTimeField(default=datetime.now, verbose_name="添加记录时间")
-
-    class Meta:
-        verbose_name = "职位信息"
-        verbose_name_plural = verbose_name
-
-    def __str__(self):
-        return self.name
+from department.models import Job, Department
 
 
 class Worker(models.Model):
@@ -70,7 +48,7 @@ class Worker(models.Model):
     is_core = models.IntegerField(choices=IS_CORE, default=0, verbose_name="是否是核心成员")
     is_charge = models.IntegerField(choices=IS_CHARGE, default=0, verbose_name="是否主负责人")
     job = models.ForeignKey(Job, on_delete=models.CASCADE, verbose_name="职位")
-    department = models.ForeignKey(verbose_name="所属部门")
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, verbose_name="所属部门")
 
     add_time = models.DateTimeField(default=datetime.now, verbose_name="添加记录时间")
 
