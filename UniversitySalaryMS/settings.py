@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+import  sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -27,6 +28,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+sys.path.insert(0, os.path.join(BASE_DIR, "apps"))
+sys.path.insert(0, os.path.join(BASE_DIR, "extra_apps"))
+
 
 # Application definition
 
@@ -41,6 +45,9 @@ INSTALLED_APPS = [
     'manager.apps.ManagerConfig',
     'worker.apps.WorkerConfig',
     'department.apps.DepartmentConfig',
+    # 后台xadmin相关app
+    'crispy_forms',
+    'xadmin',
 ]
 
 MIDDLEWARE = [
