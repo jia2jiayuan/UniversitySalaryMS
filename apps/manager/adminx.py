@@ -3,7 +3,6 @@ from .models import Manager, Worklog
 
 import xadmin
 from xadmin import views
-from xadmin.plugins.auth import UserAdmin
 
 
 class BaseSetting(object):
