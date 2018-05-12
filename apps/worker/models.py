@@ -4,6 +4,8 @@ from datetime import datetime
 from manager.models import Manager
 from department.models import Job, Department
 
+from DjangoUeditor.models import UEditorField
+
 
 class Worker(models.Model):
     """
@@ -42,19 +44,19 @@ class Worker(models.Model):
     email = models.EmailField(max_length=50, verbose_name="邮箱")
     house_addr = models.CharField(max_length=100, verbose_name="户籍地址")
     card_number = models.CharField(max_length=20, verbose_name="身份证号码")
-    education = models.CharField(max_length=15, default='not', verbose_name="学历")
+    education = models.CharField(max_length=15, choices=EDUCATION, default='not', verbose_name="学历")
     school = models.CharField(max_length=50,null=True, blank=True, verbose_name="毕业院校")
     work_status = models.IntegerField(choices=WORK_STATUS, default=0, verbose_name="在职状态")
     join_time = models.DateTimeField(verbose_name="入职时间")
     is_core = models.IntegerField(choices=IS_CORE, default=0, verbose_name="是否是核心成员")
     is_charge = models.IntegerField(choices=IS_CHARGE, default=0, verbose_name="是否主负责人")
-    job = models.ForeignKey(Job, on_delete=models.CASCADE, verbose_name="职位")
-    department = models.ForeignKey(Department, on_delete=models.CASCADE, verbose_name="所属部门")
+    job = models.ForeignKey(Job, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="职位")
+    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="所属部门")
 
     add_time = models.DateTimeField(default=datetime.now, verbose_name="添加记录时间")
 
     class Meta:
-        verbose_name = "职工信息"
+        verbose_name = "员工信息"
         verbose_name_plural = verbose_name
 
     def __str__(self):
@@ -69,12 +71,14 @@ class Comment(models.Model):
         (0, '未达到'),
         (1, '达到')
     )
-    expect_requirements = models.TextField(verbose_name="预期要求")
+    expect_requirements = UEditorField(verbose_name="预期要求", imagePath='comment/images/%Y/%m', width=1000,
+                                       height=300, filePath='comment/files/%Y/%m')
     is_meet = models.IntegerField(choices=IS_MEET, default=0, verbose_name="是否达到预期")
     aspect = models.CharField(max_length=200, verbose_name="针对哪方面")
-    comment = models.TextField(verbose_name="评价内容")
-    comment_user = models.ForeignKey(Manager, on_delete=models.CASCADE, verbose_name="评价人")
-    worker = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name="员工")
+    comment = UEditorField(verbose_name="评价内容", imagePath='comment/images/%Y/%m', width=1000,
+                             height=300, filePath='comment/files/%Y/%m')
+    comment_user = models.ForeignKey(Manager, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="评价人")
+    worker = models.ForeignKey(Worker, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="员工")
 
     add_time = models.DateTimeField(default=datetime.now, verbose_name="添加记录时间")
 
@@ -94,7 +98,7 @@ class Salary(models.Model):
         (0, '未发放'),
         (1, '发放')
     )
-    worker = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name="职工")
+    worker = models.ForeignKey(Worker, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="职工")
     salary = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="工资")
     achievements = models.DecimalField(default=0, max_digits=1, decimal_places=1, verbose_name="绩效")
     has_pay = models.IntegerField(default=0, verbose_name="是否结算工资")

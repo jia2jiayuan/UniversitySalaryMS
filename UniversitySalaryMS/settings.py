@@ -28,6 +28,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+sys.path.insert(0, BASE_DIR)
 sys.path.insert(0, os.path.join(BASE_DIR, "apps"))
 sys.path.insert(0, os.path.join(BASE_DIR, "extra_apps"))
 
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'DjangoUeditor',
      # 注册创建的app
     'manager.apps.ManagerConfig',
     'worker.apps.WorkerConfig',
@@ -48,6 +50,8 @@ INSTALLED_APPS = [
     # 后台xadmin相关app
     'crispy_forms',
     'xadmin',
+    # 富文本编辑
+
 ]
 
 MIDDLEWARE = [
@@ -76,6 +80,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                # 上传图片配置
+                'django.template.context_processors.media',
             ],
         },
     },
@@ -134,6 +140,9 @@ USE_L10N = True
 # 禁用UTC时间
 USE_TZ = False
 
+# 设置图片上传路径
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/

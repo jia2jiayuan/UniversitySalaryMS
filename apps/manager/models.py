@@ -1,9 +1,10 @@
 from django.db import models
-
 # django内置用户基础表
 from django.contrib.auth.models import AbstractUser
 # 时间模块，用于添加时间信息
 from datetime import datetime
+
+from DjangoUeditor.models import UEditorField
 
 
 class Manager(AbstractUser):
@@ -20,12 +21,13 @@ class Manager(AbstractUser):
         (1, '是')
     )
     name = models.CharField(max_length=20, verbose_name="姓名")
-    image = models.ImageField(max_length=50, verbose_name="照片")
+    image = models.ImageField(max_length=50, upload_to="manager/%Y/%m", null=True, blank=True, verbose_name="照片")
     sex = models.CharField(max_length=6, choices=SEX,default="male", verbose_name="性别")
     birthday = models.DateField(null=True, blank=True, verbose_name="出生日期")
     phone_number = models.CharField(max_length=11, verbose_name='手机号码')
     qq_number = models.CharField(max_length=11, verbose_name='QQ账号')
-    work_description = models.TextField(verbose_name="职业描叙")
+    work_description = UEditorField(verbose_name="职业描叙", imagePath='manager/images/%Y/%m', width=1000,
+                             height=300, filePath='manager/files/%Y/%m', null=True, blank=True)
     username = models.CharField(max_length=150, unique=True, verbose_name="登录账号")
     is_superuser = models.IntegerField(choices=IS_STATUS,default=0, verbose_name="是否超级用户")
     is_staff = models.IntegerField(choices=IS_STATUS,default=0, verbose_name="管理员")
@@ -36,7 +38,6 @@ class Manager(AbstractUser):
     date_joined = None
     first_name = None
     last_name = None
-
 
     add_time = models.DateTimeField(default=datetime.now, verbose_name="添加记录时间")
 
@@ -51,6 +52,11 @@ class Manager(AbstractUser):
         # 创建对象返回的信息提示
         return self.name
 
+    def worklog_num(self):
+        return self.worklog_set.all().count()
+    worklog_num.short_description = "日志数量"
+
+
 
 class Worklog(models.Model):
     """
@@ -61,11 +67,12 @@ class Worklog(models.Model):
         (1, "完成"),
     )
     name = models.CharField(max_length=20, verbose_name="工作名")
-    content = models.TextField(verbose_name="工作内容")
+    content = UEditorField(verbose_name="工作内容", imagePath='worklog/images/%Y/%m', width=1000,
+                             height=300, filePath='worklog/files/%Y/%m', null=True, blank=True)
     start_time = models.DateTimeField(verbose_name="开始时间")
     end_time = models.DateTimeField(verbose_name="结束时间")
     has_finished = models.IntegerField(choices=WORK_STATUS, default=0, verbose_name="是否完成工作")
-    manager = models.ForeignKey(Manager, on_delete=models.CASCADE, verbose_name="管理员")
+    manager = models.ForeignKey(Manager, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="管理员")
     add_time = models.DateTimeField(default=datetime.now, verbose_name="添加记录时间")
 
     class Meta:

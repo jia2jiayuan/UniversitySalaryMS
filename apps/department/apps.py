@@ -3,3 +3,4 @@ from django.apps import AppConfig
 
 class DepartmentConfig(AppConfig):
     name = 'department'
+    verbose_name = "部门信息中心"
