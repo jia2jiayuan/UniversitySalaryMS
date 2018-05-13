@@ -100,7 +100,7 @@ DATABASES = {
         'NAME': "UniversitySalaryMS",
         'USER': "salaryMS",
         'PASSWORD': "123456",
-        'HOST': '10.0.0.110'
+        'HOST': '127.0.0.1'
     }
 }
 

@@ -51,15 +51,18 @@ installPath="/application"
 pythonSoftName="Python"
 nginxSoftName="nginx"
 nginxServerName="www"
+mysqlSoftName="mysql"
 
 # 软件版本
 pythonVersion="3.6.4"
 nginxVersion="1.12.2"
 nginxHidenVersion="2.2.15"
+mysqlVersion="5.5.60"
 
 # 软件执行目录
 pythonBinPath="bin"
 nginxBinPath="sbin"
+mysqlBinPaht="bin"
 
 # 软件启动目录
 nginxStartCmd="nginx"
@@ -67,10 +70,12 @@ nginxStartCmd="nginx"
 # 软件解压后包名
 pythonPkgPath="${pythonSoftName}-${pythonVersion}"
 nginxPkgPath="${nginxSoftName}-${nginxVersion}"
+mysqlPkgPath="${mysqlSoftName}-${mysqlVersion}"
 
 # 软件下载压缩包名
 pythonPkgName="${pythonPkgPath}.tgz"
 nginxPkgName="${nginxPkgPath}.tar.gz"
+mysqlPkgName="${mysqlPkgPath}.tar.gz"
 
 # 软件核心配置文件
 nginxConfFile="${installPath}/${nginxSoftName}/conf/nginx.conf"
@@ -78,16 +83,21 @@ nginxConfFile="${installPath}/${nginxSoftName}/conf/nginx.conf"
 # 软件下载 URL
 pythonDownloadUrl="https://www.python.org/ftp/python/${pythonVersion}/${pythonPkgName}"
 nginxDownloadUrl="http://nginx.org/download/${nginxPkgName}"
+mysqlDownloadUrl="https://cdn.mysql.com//Downloads/MySQL-5.5/$mysqlPkgName"
 
 # 软件运行所需要的用户
 rootUser="root"
 mysqlRunUser="mysql"
 nginxRunUser="nginx"
 
+# 软件root密码
+mysqlRootPwd="123456."
+
 # 软件相关依赖包
 pythonRelayPkg="zlib-devel:gcc:gcc-c++:openssl-devel:sqlite-devel:wget"
 nginxRelayPkg="pcre-devel:openssl-devel:gcc-c++:wget"
 pythonVirtualPkg="virtualenvwrapper"
+mysqlRelayPkg="cmake:ncurses-devel:gcc-c++:openssl-devel"
 
 # 相关编译参数
 nginxConfigure="\
@@ -102,6 +112,27 @@ pythonConfigure="\
 --prefix=$installPath/${pythonPkgPath}:\
 --with-ssl"
 
+mysqlConfigure="\
+-DCMAKE_INSTALL_PREFIX=/application/mysql-${mysqlVersion}:\
+-DMYSQL_DATADIR=/application/mysql-${mysqlVersion}/data:\
+-DMYSQL_UNIX_ADDR=/application/mysql-${mysqlVersion}/mysql.sock:\
+-DEXTRA_CHARSETS=gbk,gb2312,utf8,ascii:\
+-DWITH_INNOBASE_STORAGE_ENGINE=1:\
+-DWITH_FEDERATED_STORAGE_ENGINE=1:\
+-DWITHOUT_EXAMPLE_STORAGE_ENGINE=1:\
+-DWITH_BLACKHOLE_STORAGE_ENGINE=1:\
+-DWITHOUT_PARTITION_STORAGE_ENGINE=1:\
+-DWITH_SSL=yes:\
+-DENABLED_LOCAL_INFILE=1:\
+-DWITH_ZLIB=bundled:\
+-DWITH_READLINE=1"
+
+# mysql相关信息
+mysqlDataPath="${installPath}/$mysqlSoftName/data"
+mysqlConfPath="/etc/my.cnf"
+mysqlDaemon="/etc/init.d/mysqld"
+mysqlSourceDaemonFile="mysql.server"
+mysqlSourceConfFile="my-small.cnf"
 
 # 初始化下载目录
 [ -d $soureDownloadPath ] || {
@@ -137,12 +168,12 @@ function envAddRunUser {
 }
 
 # 下载软件的源码包
-# DownloadUrl PkgName
+# DownloadUrl SoftName PkgName
 function GoDownload {
     cd $soureDownloadPath
     if [ ! -f $3 ]; then
         echo "download $2 ...ing, please wait ...ing"
-        wget $1
+        wget -q $1
     fi
     sureOk $? "download $2"    
 }
@@ -170,15 +201,20 @@ function envUntarPkg {
 # PkgPath Configure SoftName "make/cmake"
 function GoConfigure {
     cd $soureDownloadPath/$1
-    echo "configure $3 ...ing, please wait ...ing"
-    ./configure $(echo $2|tr ":" " ") &> /dev/null
-    sureOk $? "configure $3"
-
+    if [ $4 == "cmake" ]; then
+        echo "cmake $3 ...ing, please wait ...ing"
+        cmake $(echo $2|tr ":" " ") &> /dev/null
+        sureOk $? "cmake $3"
+    else
+        echo "configure $3 ...ing, please wait ...ing"
+        ./configure $(echo $2|tr ":" " ") &> /dev/null
+        sureOk $? "configure $3"
+    fi
 }
 
 function envConfigure {
-    GoConfigure $nginxPkgPath $nginxConfigure $nginxSoftName 
-    GoConfigure $pythonPkgPath $pythonConfigure $pythonSoftName
+    GoConfigure $nginxPkgPath $nginxConfigure $nginxSoftName "make"
+    GoConfigure $pythonPkgPath $pythonConfigure $pythonSoftName "make"
 }
 
 # 编译源码
@@ -307,14 +343,14 @@ function AliyunPipConf {
     echo -e "[global]\ntrusted-host=mirrors.aliyun.com\nindex-url=http://mirrors.aliyun.com/pypi/simple/" > pip.conf
     sureOk $? "AliyunPipConf"
 }
-AliyunPipConf
+# AliyunPipConf
 
 function pyVitrualenvInstall {
     . $globalPath
     pip3 install $pythonVirtualPkg &> /dev/null
     sureOk $? "pyVitrualenvInstall"
 }
-pyVitrualenvInstall
+# pyVitrualenvInstall
 
 function createPyVitrualenv {
     [ -d $vitrualEnvPath ] || {
@@ -331,13 +367,13 @@ export PIP_RESPECT_VIRTUALENV=true
 EOF
     sureOk $? "createPyVitrualenv"
 }
-createPyVitrualenv
+# createPyVitrualenv
 
 function persionPyVirtualCmdAlias {
     sed -i "9i alias mkenv='mkvirtualenv'\nalias rmenv='rmvirtualenv'\nalias outenv='deactivate'" $userBashConf
     sureOk $? "persionPyVirtualCmdAlias"
 }
-persionPyVirtualCmdAlias
+# persionPyVirtualCmdAlias
 
 function initPythonVirtualEnv {
    AliyunPipConf
@@ -348,66 +384,6 @@ function initPythonVirtualEnv {
 }
 initPythonVirtualEnv
 # sureOK $? "initPythonVirtualEnv"
-
-# 安装数据库
-
-# 是否安装源, 没有则安装
-# mysqlRepoConf mysqlRepoUrlOs6 mysqlRepoUrlOs7
-function initMysqlRepo {
-    [ -f $1 ] || {
-        if [ $CentosVersion == "6" ]; then
-            rpm -ivh $2 &> /dev/null
-            sureOk 0 "initMysqlRepo"
-        else
-            rpm -ivh $3 &> /dev/null
-            sureOk 0 "initMysqlRepo"
-        fi
-    }
-}
-# initMysqlRepo
-
-# 安装mysql
-# mysqlServer
-function mysqlInstall {
-    yum install -y $1 &> /dev/null
-    sureOk $? "mysqlInstall"
-}
-# mysqlInstall
-
-# 初始化mysql配置数据库
-# mysqlConf serverRune
-function initmysqlConf {
-    \cp $1{,.$(date +%F)}
-    cat /dev/null > $1
-    cat >>$1<<EOF
-[mysqld]
-user=mysql
-character_set_server=$2
-datadir=/var/lib/mysql
-socket=/var/lib/mysql/mysql.sock
-symbolic-links=0
-[mysqld_safe]
-log-error=/var/log/mysqld.log
-pid-file=/var/run/mysqld/mysqld.pid
-EOF
-    sed -i "4a character_set_server=$serverRune" $mysqlConf && sed -i "4a init_connection='$initCmd'" $mysqlConf
-    sureOk $? "mysqlConf"
-}
-
-
-function mysqlYumInstall {
-    mysqlRepoUrlOs6="https://repo.mysql.com//mysql57-community-release-el6-11.noarch.rpm"
-    mysqlRepoUrlOs7="https://repo.mysql.com//mysql57-community-release-el7-11.noarch.rpm"
-    mysqlRepoConf="/etc/yum.repos.d/mysql-community.repo"
-    mysqlConf="/etc/my.cnf"
-    mysqlServer="mysql-community-server"
-    serverRune="utf8"
-
-    initMysqlRepo $mysqlRepoConf $mysqlRepoUrlOs6 $mysqlRepoUrlOs7
-    mysqlInstall $mysqlServer
-    initmysqlConf $mysqlConf
-}
-# mysqlYumInstall
 
 # 下载项目
 function gitCloneUniversitySalaryMS {
@@ -428,18 +404,21 @@ function iniUniversitySalaryMSPythonEnv {
 
 # 进入虚拟环境安装相关依赖
 function installPythonRelayPkg {
-    pip3 install uwsgi
     . $userBashConf &>  /dev/null
     . $globalPath &>  /dev/null
+    echo "pip install uwsgi ...ing"
+    pip3 install uwsgi &>  /dev/null
+    sureOk $? "install uwsgi"
     cd $2
     workon $1
-    pip3 install -r requirements.txt
+    echo "pip install PythonRelayPkg ...ing"
+    pip3 install -r requirements.txt &>  /dev/null
     sureOk $? "installPythonRelayPkg"
 }
 
 # 使用 uwsgi启动项目
 function uwsgiStartUniversitySalaryMS {
-    echo "uwsgi --ini $1 --uid $(id -u $2)" >> $onbootFile
+    echo "/application/Python/bin/uwsgi --ini $1 --uid $(id -u $2)" >> $onbootFile
     sureOk $? "add uwsgi to onboot"
     . $globalPath
     uwsgi --ini $1 --uid $(id -u $2) &
@@ -456,6 +435,95 @@ function startNginx {
     sureOk $? "add nginx to onboot"
 }
 
+
+# 初始化数据库
+# mysqlSoftName mysqlDataPath mysqlRunUser
+function initMysql {
+    cd $installPath/$1/scripts/
+    ./mysql_install_db --basedir=$installPath/$1 --datadir=$2 --user=$3 &> /dev/null
+    sureOk $? "initMysql"
+}
+
+# 数据库配置初始化
+# 
+function confMysql {
+    cd $installPath/$mysqlSoftName/support-files
+    # 拷贝mysql启动程序
+    \cp $mysqlSourceDaemonFile $mysqlDaemon
+    sureOk $? "Copy mysqlDaemon to /etc/init.d/"
+    # 拷贝其配置文件
+    \cp $mysqlSourceConfFile $mysqlConfPath
+    sureOk $? "Copy mysqlDaemon to /etc/init.d/"
+    
+    chown -R $mysqlRunUser.$mysqlRunUser $installPath/$mysqlSoftName/
+    sureOk $? "init $mysqlRunUser manage $installPath/$mysqlSoftName/"
+}
+
+# 初始化数据库root密码
+# rootUser mysqlRootPwd
+function initMysqlRootPwd {
+    . $globalPath
+    mysqladmin -u $1 password "$2"
+    sureOk $? "initMysqlRootPwd"
+}
+
+# 初始化数据库环境，删除无用用户和test数据库
+# rootUser mysqlRootPwd
+function initMysqlEnv {
+    . $globalPath
+    dropSql="drop user ''@localhost;drop user ''@'$(hostname)';drop database test;"
+    flushSql="flush privileges;"
+    mysql -u$1 -p$2 -e "$dropSql" && mysql -u$rootUser -p$mysqlRootPwd -e "$flushSql"
+    sureOk $? "initWebMysql"
+}
+
+# 启动数据库
+function startMysql {
+    . /etc/profile
+    /etc/init.d/mysqld start &> /dev/null
+    sureOk $? "startMysql"
+}
+
+# 数据库额外除安装完成之后的一些工作
+function envMysqlExtraWork {
+    initMysql $mysqlSoftName $mysqlDataPath $mysqlRunUser
+    confMysql 
+    startMysql
+    initMysqlRootPwd $rootUser $mysqlRootPwd
+    initMysqlEnv $rootUser $mysqlRootPwd  
+}
+
+
+# 初始化项目mysql数据库环境
+# rootUser mysqlRootPwd
+function UniversitySalaryMysqlEnv {
+    . $globalPath
+    createSql='create database UniversitySalaryMS;'
+    grantSql="grant all privileges on UniversitySalaryMS.* to 'SalaryMS'@'%' identified by '123456';"
+    flushSql="flush privileges;"
+    mysql -u$1 -p$2 -e "$createSql" && mysql -u$rootUser -p$mysqlRootPwd -e "$grantSql" && mysql -u$rootUser -p$mysqlRootPwd -e "$flushSql"
+    sureOk $? "UniversitySalaryMysqlEnv"
+}
+
+# 数据库的安装独立出来，这些是数据库软件单独安装的main函数
+function alone_envMysqlEnv_Build {
+    GoYumRelayPkg  $mysqlSoftName $mysqlRelayPkg
+    GoAddRunUser $mysqlRunUser
+    GoDownload $mysqlDownloadUrl $mysqlSoftName $mysqlPkgPath
+    GoUntar $mysqlPkgName
+    GoConfigure $mysqlPkgPath $mysqlConfigure $mysqlSoftName "cmake"
+    GoMake $mysqlPkgPath $mysqlSoftName
+    GoMakeInstall $mysqlPkgPath $mysqlSoftName
+    GoCreateSoftLink $mysqlPkgPath $mysqlSoftName
+    GoGlobalSet $mysqlSoftName $mysqlBinPaht
+
+    envMysqlExtraWork
+
+    UniversitySalaryMysqlEnv  $rootUser $mysqlRootPwd
+}
+# 如果mysql 和 php nginx 安装在同一个服务上，则取消这个注释
+alone_envMysqlEnv_Build
+
 function UniversitySalaryMSOnlineEnv {
     UniversitySalaryMSGitUrl="https://github.com/jia2jiayuan/UniversitySalaryMS.git"
     UniversitySalaryMSEnvName="UniversitySalaryMS"
@@ -469,3 +537,4 @@ function UniversitySalaryMSOnlineEnv {
     uwsgiStartUniversitySalaryMS $uwsgiConfPath $nginxRunUser
 }
 UniversitySalaryMSOnlineEnv
+
