@@ -173,7 +173,7 @@ function GoDownload {
     cd $soureDownloadPath
     if [ ! -f $3 ]; then
         echo "download $2 ...ing, please wait ...ing"
-        wget -q $1
+        wget $1
     fi
     sureOk $? "download $2"    
 }
@@ -482,6 +482,8 @@ function startMysql {
     . /etc/profile
     /etc/init.d/mysqld start &> /dev/null
     sureOk $? "startMysql"
+    chkconfig mysqld on
+    sureOk $? "startMysql" "addd mysql to onboot"
 }
 
 # 数据库额外除安装完成之后的一些工作
@@ -499,7 +501,7 @@ function envMysqlExtraWork {
 function UniversitySalaryMysqlEnv {
     . $globalPath
     createSql='create database UniversitySalaryMS;'
-    grantSql="grant all privileges on UniversitySalaryMS.* to 'SalaryMS'@'%' identified by '123456';"
+    grantSql="grant all privileges on UniversitySalaryMS.* to 'SalaryMS'@'localhost' identified by '123456';"
     flushSql="flush privileges;"
     mysql -u$1 -p$2 -e "$createSql" && mysql -u$rootUser -p$mysqlRootPwd -e "$grantSql" && mysql -u$rootUser -p$mysqlRootPwd -e "$flushSql"
     sureOk $? "UniversitySalaryMysqlEnv"
