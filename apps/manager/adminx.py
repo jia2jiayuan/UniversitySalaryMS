@@ -50,24 +50,19 @@ class ManagerAdmin(object):
         # 可以在保存课程实例的时候，做些任务，像触发器.新增和修改都会走这个流程
         # 如以下保存机构中course_num课程数量统计
         obj = self.new_obj
-        print(obj.password)
+        # print(obj.password)
         # 获取初始密码
+        raw_password = ""
         if Manager.objects.filter(id=obj.id):
             raw_password = Manager.objects.get(id=obj.id).password
 
         # 获取保存时候密码
         new_password = obj.password
-        print("new_password:", new_password)
         # 如果两者不相同，则认为修改了密码，重新进行sha1加密
         if raw_password != new_password:
             obj.password = make_password(obj.password)
         # print(obj.password)
         obj.save()
-        # odj.save()
-        # if obj:
-        #   course_org = obj.course_org
-        #   course_org.course_num = Course.objects.filter(course_org=course_org).count()
-        #   course_org.save()
         pass
 
 

@@ -4,7 +4,6 @@ from datetime import datetime
 from manager.models import Manager
 from department.models import Job, Department
 
-from DjangoUeditor.models import UEditorField
 
 
 class Worker(models.Model):
@@ -71,14 +70,16 @@ class Comment(models.Model):
         (0, '未达到'),
         (1, '达到')
     )
-    expect_requirements = UEditorField(verbose_name="预期要求", imagePath='comment/images/%Y/%m', width=1000,
-                                       height=300, filePath='comment/files/%Y/%m')
+    worker = models.ForeignKey(Worker, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="员工")
+    expect_requirements = models.TextField(null=True, blank=True, verbose_name="预期要求")
+    # expect_requirements = UEditorField(verbose_name="预期要求", imagePath='comment/images/%Y/%m', width=1000,
+    #                                    height=300, filePath='comment/files/%Y/%m')
     is_meet = models.IntegerField(choices=IS_MEET, default=0, verbose_name="是否达到预期")
     aspect = models.CharField(max_length=200, verbose_name="针对哪方面")
-    comment = UEditorField(verbose_name="评价内容", imagePath='comment/images/%Y/%m', width=1000,
-                             height=300, filePath='comment/files/%Y/%m')
+    comment = models.TextField(null=True, blank=True, verbose_name="评价内容")
+    # comment = UEditorField(verbose_name="评价内容", imagePath='comment/images/%Y/%m', width=1000,
+    #                          height=300, filePath='comment/files/%Y/%m')
     comment_user = models.ForeignKey(Manager, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="评价人")
-    worker = models.ForeignKey(Worker, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="员工")
 
     add_time = models.DateTimeField(default=datetime.now, verbose_name="添加记录时间")
 
@@ -100,8 +101,8 @@ class Salary(models.Model):
     )
     worker = models.ForeignKey(Worker, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="职工")
     salary = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="工资")
-    achievements = models.DecimalField(default=0, max_digits=1, decimal_places=1, verbose_name="绩效")
-    has_pay = models.IntegerField(default=0, verbose_name="是否结算工资")
+    achievements = models.DecimalField(default=0, max_digits=2, decimal_places=1, verbose_name="绩效")
+    has_pay = models.IntegerField(default=0,choices=HAS_PAY, verbose_name="是否结算工资")
 
     add_time = models.DateTimeField(default=datetime.now, verbose_name="添加记录时间")
 

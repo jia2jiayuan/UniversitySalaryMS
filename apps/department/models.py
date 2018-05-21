@@ -1,7 +1,6 @@
 from django.db import models
 from datetime import datetime
 
-from DjangoUeditor.models import UEditorField
 
 
 class Job(models.Model):
@@ -13,8 +12,9 @@ class Job(models.Model):
         (1, '是')
     )
     name = models.CharField(max_length=20, verbose_name="职位名")
-    description = UEditorField(verbose_name="工作描叙", imagePath='job/images/%Y/%m', width=1000,
-                             height=300, filePath='job/files/%Y/%m')
+    description = models.TextField(null=True, blank=True,verbose_name="部门描叙")
+    # description = UEditorField(verbose_name="工作描叙", imagePath='job/images/%Y/%m', width=1000,
+    #                          height=300, filePath='job/files/%Y/%m')
     expect_salary = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="预估工资")
     is_core = models.IntegerField(choices=IS_CORE, default=0, verbose_name="是否是核心职位")
 
@@ -39,11 +39,13 @@ class Department(models.Model):
     """
     name = models.CharField(max_length=20, verbose_name="部门名")
     duty = models.CharField(max_length=200, verbose_name="部门职责")
-    description = UEditorField(verbose_name="部门描叙", imagePath='department/images/%Y/%m', width=1000,
-                             height=300, filePath='department/files/%Y/%m', null=True, blank=True)
+    description = models.TextField(null=True, blank=True, verbose_name="部门描叙")
+    # description = UEditorField(verbose_name="部门描叙", imagePath='department/images/%Y/%m', width=1000,
+    #                          height=300, filePath='department/files/%Y/%m', null=True, blank=True)
     create_time = models.DateField(verbose_name="创建时间")
-    vision = UEditorField(verbose_name="部门愿景", imagePath='department/images/%Y/%m', width=1000,
-                             height=300, filePath='department/files/%Y/%m', null=True, blank=True)
+    vision = models.TextField(null=True, blank=True, verbose_name="部门愿景")
+    # vision = UEditorField(verbose_name="部门愿景", imagePath='department/images/%Y/%m', width=1000,
+    #                          height=300, filePath='department/files/%Y/%m', null=True, blank=True)
 
     add_time = models.DateTimeField(default=datetime.now, verbose_name="添加记录时间")
 

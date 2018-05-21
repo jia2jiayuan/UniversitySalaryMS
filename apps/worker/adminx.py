@@ -20,7 +20,7 @@ class WorkerAdmin(object):
 
 
 class CommentAdmin(object):
-    list_display = ['expect_requirements', 'is_meet', 'aspect', 'comment', 'comment_user', 'worker', 'add_time']
+    list_display = ['worker', 'expect_requirements', 'is_meet', 'aspect', 'comment', 'comment_user',  'add_time']
     search_fields = ['expect_requirements', 'is_meet', 'aspect', 'comment', 'comment_user', 'worker']
     list_filter = ['expect_requirements', 'is_meet', 'aspect', 'comment', 'comment_user', 'worker', 'add_time']
     list_editable = ['expect_requirements', 'is_meet', 'aspect', 'comment', 'comment_user', 'worker', 'add_time']

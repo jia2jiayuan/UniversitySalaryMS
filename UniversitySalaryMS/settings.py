@@ -24,7 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '-+==m)!2x00r^@&ww327y$ziralazv#enze%8rv-nk@a4s09k4'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'DjangoUeditor',
      # 注册创建的app
     'manager.apps.ManagerConfig',
     'worker.apps.WorkerConfig',
@@ -100,7 +99,7 @@ DATABASES = {
         'NAME': "UniversitySalaryMS",
         'USER': "salaryMS",
         'PASSWORD': "123456",
-        'HOST': 'localhost',
+        'HOST': '10.0.0.110',
         'PORT': '3306',
     }
 }
